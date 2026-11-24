@@ -1,8 +1,10 @@
 # QVerb — Auto-Clear Vocal Reverb for Akai MPC
 
-A compact vocal reverb with six knobs and one switch. The reverb core is
+A compact vocal reverb with six knobs and two switches. The reverb core is
 MVerb's Dattorro figure-of-eight algorithm. The Auto Clear stage is a musical
-vocal-keyed ducker; at 100% it becomes a hard tank clear.
+vocal-keyed ducker; at 100% it becomes a hard tank clear. The output limiter
+runs at 2x oversampling, so a hot reverb sum stays silky instead of turning
+fizzy.
 
 ![QVerb on the Akai MPC](qverb-mpc.jpg)
 
@@ -17,9 +19,25 @@ vocal-keyed ducker; at 100% it becomes a hard tank clear.
 | **Width** | mono to extra wide |
 | **Clear** | Auto Clear depth, 0–100% |
 | **Auto Clear** | on/off |
+| **OS 2x** | 2x oversampling around the output limiter, on by default |
 
 No size, density, early-level or output-gain controls. The size is fixed at a
 musical vocal hall and the output is limited internally.
+
+## Output limiter and OS 2x
+
+The final stage is a soft clipper with its knee at **−0.35 dBFS**. Below the
+knee it is bit-transparent; only peaks above it are shaped. With **OS 2x** on,
+the clipper runs at twice the sample rate, so the harmonics it creates stay
+above Nyquist instead of folding back into the audible band. That fold-back is
+what made hot tails sound harsh and "fizzy".
+
+- **On** (default): 6 samples of latency (0.14 ms at 44.1 kHz), reported to the
+  host and compensated automatically. Use this for anything loud.
+- **Off**: latency-free, original 1x clipper. Useful when the track already has
+  latency-critical routing or you want the exact 1.0 behaviour.
+
+The reverb core itself is linear and static, so it does not need oversampling.
 
 ## Auto Clear for vocals
 
@@ -35,7 +53,11 @@ voice. The detector is adaptive and works over a sustained pad or a busy mix.
 ## Programs
 
 `Vocal Air` (default), `Close Vocal`, `Hazy Pad`, `Dub Vocal`, `Wide Hall`,
-`Room`, `Init`.
+`Room`, `Init`, `Silky Drums`.
+
+`Silky Drums` is Mix 7 %, Decay 2.80 s, Tone 80 %, Pre-Delay 10 ms, Width
+140 %, Clear 62 %, Auto Clear on: a short, bright, wide bloom that only opens
+between the hits.
 
 ## Build
 
@@ -51,7 +73,7 @@ writes:
 
 ```
 dist/mpc/Tilr - VST - QVerb/
-dist/Tilr - VST - QVerb-1.0.0.zip
+dist/Tilr - VST - QVerb-1.1.0.zip
 ```
 
 Install on a connected MPC:
@@ -67,8 +89,16 @@ in the MPC preferences, restart/rescan.
 
 ```
 Input -> 80 Hz high-pass -> Pre-Delay -> MVerb/Dattorro
-      -> tone/damping -> stereo width -> Auto Clear -> dry/wet -> limiter
+      -> tone/damping -> stereo width -> Auto Clear -> dry/wet
+      -> 2x oversampled limiter (knee -0.35 dBFS)
 ```
+
+## Versions
+
+- **1.1.0** — 2x oversampled output limiter with an on/off switch, knee raised
+  from −0.92 to −0.35 dBFS, new `Silky Drums` program.
+- **1.0.0** — first release. Tag `v1.0.0` is the reference version with the
+  original 1x limiter.
 
 ## Credits and license
 

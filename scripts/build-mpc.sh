@@ -90,13 +90,13 @@ The arm64 build is for 64-bit MPC OS devices (MPC Live III / XL and later).
 The arm32 build is for Gen1 devices (Live / Live II / One / One+ / X / Key /
 Force) running MPC OS 3.10.1 or later.
 
-The UI is the single VERB page: Mix, Decay, Tone, Pre-Delay, Width, Clear and
-the Auto Clear switch. The bottom waveform is the design reference, not a
-live scope.
+The UI is the single VERB page: Mix, Decay, Tone, Pre-Delay, Width, Clear,
+the Auto Clear switch and the OS 2x switch. Clear at 100% is a hard kill.
+The bottom waveform is the design reference, not a live scope.
 EOF
 
 cat > "$PKG/README.txt" <<'EOF'
-QVerb 1.0.0 - Auto-Clear vocal reverb for Akai MPC
+QVerb 1.1.0 - Auto-Clear vocal reverb for Akai MPC
 ===================================================
 
 QVerb is a compact vocal reverb built around a Dattorro/MVerb core, with a
@@ -111,6 +111,8 @@ Pre-Delay  0 - 120 ms
 Width      mono to extra wide
 Clear      Auto Clear depth (0 - 100%)
 Auto Clear on/off
+OS 2x      2x oversampling around the output limiter (on by default);
+           adds 6 samples of latency, reported to the host
 
 Auto Clear for vocals
 ---------------------
@@ -126,12 +128,14 @@ The dry vocal is never filtered or ducked.
 
 Programs
 --------
-Vocal Air, Close Vocal, Hazy Pad, Dub Vocal, Wide Hall, Room, Init.
+Vocal Air, Close Vocal, Hazy Pad, Dub Vocal, Wide Hall, Room, Init,
+Silky Drums.
 
 Signal path
 -----------
 Input -> 80 Hz high-pass -> Pre-Delay -> Dattorro/MVerb reverb
-      -> tone/damping -> stereo width -> Auto Clear -> dry/wet -> limiter
+      -> tone/damping -> stereo width -> Auto Clear -> dry/wet
+      -> 2x limiter (knee -0.35 dBFS)
 EOF
 
 echo "== 6/6  validate and zip"
@@ -141,7 +145,7 @@ echo "== 6/6  validate and zip"
 import os, shutil, sys
 pkg = sys.argv[1]
 root = os.path.dirname(os.path.dirname(pkg))
-archive = os.path.join(root, "Tilr - VST - QVerb-1.0.0")
+archive = os.path.join(root, "Tilr - VST - QVerb-1.1.0")
 shutil.make_archive(archive, "zip", os.path.dirname(pkg), os.path.basename(pkg))
 print("wrote " + archive + ".zip")
 PY

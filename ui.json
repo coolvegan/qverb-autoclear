@@ -19,7 +19,7 @@
         { "param": "Width", "widget": "knob" },
         { "param": "Clear", "widget": "knob" },
         { "param": "Auto Clear", "widget": "switch" },
-        { "widget": "text", "text": "100% = kill" }
+        { "param": "OS 2x", "widget": "switch" }
       ]
     }
   ]

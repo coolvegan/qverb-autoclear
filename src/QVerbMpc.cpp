@@ -122,15 +122,101 @@ private:
     bool resetDone = false;
 };
 
-inline float softLimit (float x)
+// ---------------------------------------------------------------------------
+// Output limiter
+// ---------------------------------------------------------------------------
+// The knee sits at -0.35 dBFS instead of -0.92 dBFS, so the clipper is a
+// safety net instead of a constant effect: below it the signal is untouched.
+constexpr float kLimitKnee = 0.96f;
+
+// 15-tap halfband FIR at 2x: 6 samples of measured group delay at the base rate.
+constexpr int kOsLatency = 6;
+
+inline float softClipKnee (float x, float knee)
 {
-    constexpr float knee = 0.9f;
     const float a = std::fabs (x);
     if (a <= knee)
         return x;
     const float y = knee + (1.0f - knee) * fastTanh ((a - knee) / (1.0f - knee));
     return x < 0.0f ? -y : y;
 }
+
+inline float softLimit (float x) { return softClipKnee (x, kLimitKnee); }
+
+// 2x oversampled soft clipper. Upsample, clip at 2x, downsample, so the tanh
+// harmonics stay below Nyquist instead of folding back into the audible band.
+class Limiter2x
+{
+public:
+    static constexpr int N = 15;
+    static constexpr int Ring = 32;
+
+    Limiter2x() { build(); }
+
+    void reset()
+    {
+        up.fill (0.0f);
+        down.fill (0.0f);
+        write = 0;
+    }
+
+    float process (float x)
+    {
+        up[(size_t) write] = x;
+        up[(size_t) ((write + 1) & (Ring - 1))] = 0.0f;
+
+        float y0 = 0.0f, y1 = 0.0f;
+        for (int k = 0; k < N; ++k)
+        {
+            const int a = (write - k) & (Ring - 1);
+            const int b = (write + 1 - k) & (Ring - 1);
+            y0 += h[(size_t) k] * up[(size_t) a];
+            y1 += h[(size_t) k] * up[(size_t) b];
+        }
+
+        // Zero-stuffing halves the level; the interpolator has unity DC gain.
+        y0 *= 2.0f;
+        y1 *= 2.0f;
+
+        down[(size_t) write] = softLimit (y0);
+        down[(size_t) ((write + 1) & (Ring - 1))] = softLimit (y1);
+
+        float out = 0.0f;
+        for (int k = 0; k < N; ++k)
+            out += h[(size_t) k] * down[(size_t) ((write + 1 - k) & (Ring - 1))];
+
+        write = (write + 2) & (Ring - 1);
+
+        // Decimation can overshoot a few percent after clipping; catch it.
+        return softClipKnee (out, 0.995f);
+    }
+
+private:
+    void build()
+    {
+        const int M = N / 2;
+        double sum = 0.0;
+        for (int n = 0; n < N; ++n)
+        {
+            const double x = (double) (n - M);
+            const double sinc = std::fabs (x) < 1.0e-9 ? 1.0
+                             : std::sin (kPi * 0.5 * x) / (kPi * 0.5 * x);
+            const double w = 0.42
+                           - 0.5 * std::cos (2.0 * kPi * n / (N - 1))
+                           + 0.08 * std::cos (4.0 * kPi * n / (N - 1));
+            h[(size_t) n] = (float) (0.5 * sinc * w);
+            sum += h[(size_t) n];
+        }
+        if (sum > 1.0e-9)
+            for (float& v : h)
+                v = (float) (v / sum);
+        reset();
+    }
+
+    std::array<float, N> h {};
+    std::array<float, Ring> up {}, down {};
+    int write = 0;
+};
 
 } // namespace
 
@@ -142,7 +228,7 @@ class QVerbMpc : public mpc::Plugin
 public:
     enum P
     {
-        pMix, pDecay, pTone, pPreDelay, pWidth, pClear, pAutoClear,
+        pMix, pDecay, pTone, pPreDelay, pWidth, pClear, pAutoClear, pOversample,
         kNumParams
     };
 
@@ -152,11 +238,12 @@ public:
         i.name = "QVerb";
         i.vendor = "Tilr";
         i.uniqueId = MPC_FOURCC ('q', 'v', 'r', 'b');
-        i.version = 1000;
+        i.version = 1100;
         i.isInstrument = false;
         i.numInputs = 2;
         i.numOutputs = 2;
         i.wantsMidi = false; // MPC effects receive no MIDI
+        i.latencySamples = kOsLatency; // 2x limiter is on by default
         return i;
     }
 
@@ -169,6 +256,7 @@ public:
         addParam (floatParam ("width", "Width", 0.0f, 200.0f, 140.0f, "%", 0));
         addParam (floatParam ("clear", "Clear", 0.0f, 100.0f, 55.0f, "%", 0));
         addParam (boolParam ("autoclear", "Auto Clear", true));
+        addParam (boolParam ("oversample", "OS 2x", true));
 
         addPrograms();
     }
@@ -209,6 +297,8 @@ public:
         mverb.reset();
 
         vocalClear.prepare (sampleRate);
+        limL.reset();
+        limR.reset();
         reset();
     }
 
@@ -222,10 +312,20 @@ public:
         dcR.reset();
         mverb.reset();
         vocalClear.reset();
+        limL.reset();
+        limR.reset();
+        osActive = getBool (pOversample);
 
         preSamples.snap (msToSamples (get (pPreDelay), srate));
         widthSmooth.snap (clamp (get (pWidth) * 0.01f, 0.0f, 2.0f));
         mixSmooth.snap (clamp (get (pMix) * 0.01f, 0.0f, 1.0f));
+    }
+
+    void parameterChanged (int index, float plainValue) override
+    {
+        // Switching the oversampler changes the reported latency.
+        if (index == pOversample)
+            setLatency (plainValue >= 0.5f ? kOsLatency : 0);
     }
 
     void process (mpc::ProcessContext& ctx) override
@@ -243,6 +343,14 @@ public:
             return;
 
         const float sr = srate;
+
+        const bool os = getBool (pOversample);
+        if (os != osActive)
+        {
+            osActive = os;
+            limL.reset();
+            limR.reset();
+        }
 
         const float mixTarget = clamp (get (pMix) * 0.01f, 0.0f, 1.0f);
         const float widthTarget = clamp (get (pWidth) * 0.01f, 0.0f, 2.0f);
@@ -315,9 +423,19 @@ public:
 
             float yL = dryL * dryGain + wetL * wetGain;
             float yR = dryR * dryGain + wetR * wetGain;
-            outL[i] = softLimit (flushDenormal (yL));
-            if (outR && outR != outL)
-                outR[i] = softLimit (flushDenormal (yR));
+
+            if (osActive)
+            {
+                outL[i] = limL.process (flushDenormal (yL));
+                if (outR && outR != outL)
+                    outR[i] = limR.process (flushDenormal (yR));
+            }
+            else
+            {
+                outL[i] = softLimit (flushDenormal (yL));
+                if (outR && outR != outL)
+                    outR[i] = softLimit (flushDenormal (yR));
+            }
         }
 
         if (resetTank)
@@ -378,6 +496,13 @@ private:
             { pPreDelay, 20.0f }, { pWidth, 120.0f }, { pClear, 0.0f },
             { pAutoClear, 0.0f },
         });
+        // Drums through the vocal ducker: short mix, bright and wide, so the
+        // reverb only blooms between the hits.
+        program ("Silky Drums", {
+            { pMix, 7.0f }, { pDecay, 2.8f }, { pTone, 80.0f },
+            { pPreDelay, 10.0f }, { pWidth, 140.0f }, { pClear, 62.0f },
+            { pAutoClear, 1.0f },
+        });
     }
 
     MVerb<float> mverb;
@@ -388,6 +513,8 @@ private:
     DCBlocker dcL, dcR;
     Smoother preSamples, widthSmooth, mixSmooth;
     VocalClear vocalClear;
+    Limiter2x limL, limR;
+    bool osActive = true;
 
     float srate = 44100.0f;
     int maxBlock = 1;
