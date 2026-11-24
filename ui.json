@@ -1,0 +1,26 @@
+{
+  "kit": { "theme": "cyan", "accent": "ff22e6ff" },
+  "qlinkGroups": "rows",
+  "style": {
+    "background": "ff0d1216",
+    "accent": "ff22e6ff",
+    "text": "ffffffff",
+    "muted": "ff7d8a90"
+  },
+  "pages": [
+    {
+      "name": "VERB",
+      "background": "qverb-bg.png",
+      "controls": [
+        { "param": "Mix", "widget": "knob" },
+        { "param": "Decay", "widget": "knob" },
+        { "param": "Tone", "widget": "knob" },
+        { "param": "Pre-Delay", "widget": "knob" },
+        { "param": "Width", "widget": "knob" },
+        { "param": "Clear", "widget": "knob" },
+        { "param": "Auto Clear", "widget": "switch" },
+        { "widget": "text", "text": "100% = kill" }
+      ]
+    }
+  ]
+}

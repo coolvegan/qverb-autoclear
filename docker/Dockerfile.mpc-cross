@@ -1,0 +1,19 @@
+# Cross-compile the MPC / VST2 builds. Produces:
+#   arm64  (MPC Live III / XL and other 64-bit MPC OS 3.10.1+ devices)
+#   arm32  (MPC Live / Live II / One / One+ / X / Key / Force, MPC OS 3.10.1+)
+FROM debian:bookworm
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+        g++-arm-linux-gnueabihf \
+        g++-aarch64-linux-gnu \
+        binutils-arm-linux-gnueabihf \
+        binutils-aarch64-linux-gnu \
+        python3 \
+        file \
+        ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /work

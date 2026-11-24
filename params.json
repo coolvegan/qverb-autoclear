@@ -1,0 +1,14 @@
+{
+  "name": "QVerb", "vendor": "Tilr", "uid": "qvrb", "uidInt": 1903587938, "version": 1000,
+  "isInstrument": false, "numInputs": 2, "numOutputs": 2, "numPrograms": 7,
+  "programs": ["Vocal Air", "Close Vocal", "Hazy Pad", "Dub Vocal", "Wide Hall", "Room", "Init"],
+  "params": [
+    {"index": 0, "id": null, "name": "Mix", "label": "%", "display": "32", "default": 0.32, "automatable": true, "kind": "int", "choices": []},
+    {"index": 1, "id": null, "name": "Decay", "label": "s", "display": "2.80", "default": 0.605493, "automatable": true, "kind": "float", "choices": []},
+    {"index": 2, "id": null, "name": "Tone", "label": "%", "display": "65", "default": 0.65, "automatable": true, "kind": "int", "choices": []},
+    {"index": 3, "id": null, "name": "Pre-Delay", "label": "ms", "display": "25", "default": 0.390171, "automatable": true, "kind": "int", "choices": []},
+    {"index": 4, "id": null, "name": "Width", "label": "%", "display": "140", "default": 0.7, "automatable": true, "kind": "int", "choices": []},
+    {"index": 5, "id": null, "name": "Clear", "label": "%", "display": "55", "default": 0.55, "automatable": true, "kind": "int", "choices": []},
+    {"index": 6, "id": null, "name": "Auto Clear", "label": "", "display": "On", "default": 1.0, "automatable": true, "kind": "bool", "choices": ["Off", "On"]}
+  ]
+}

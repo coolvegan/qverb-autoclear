@@ -1,0 +1,16 @@
+{
+  "name": "QVerb",
+  "manufacturer": "Tilr",
+  "version": "1.0.0",
+  "format": "vst2",
+  "kind": "effect",
+  "uid": "qvrb",
+  "numInputs": 2,
+  "numOutputs": 2,
+  "category": "Reverb",
+  "file32": "VST/qverb-arm32.so",
+  "file64": "VST/qverb-arm64.so",
+  "description": "Vocal reverb with a musical Auto Clear ducker, pre-delay, tone, stereo width and an optional hard tank clear. Six knobs, seven programs.",
+  "author": "Tilr",
+  "license": "GPL-3.0-or-later"
+}
