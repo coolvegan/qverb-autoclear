@@ -4,7 +4,7 @@ A compact vocal reverb with six knobs and one switch. The reverb core is
 MVerb's Dattorro figure-of-eight algorithm. The Auto Clear stage is a musical
 vocal-keyed ducker; at 100% it becomes a hard tank clear.
 
-![QVerb layout](layout.webp)
+![QVerb on the Akai MPC](qverb-mpc.jpg)
 
 ## Controls
 
