@@ -1,5 +1,5 @@
 {
-  "name": "QVerb", "vendor": "Tilr", "uid": "qvrb", "uidInt": 1903587938, "version": 1100,
+  "name": "QVerb", "vendor": "Tilr", "uid": "qvrb", "uidInt": 1903587938, "version": 1101,
   "isInstrument": false, "numInputs": 2, "numOutputs": 2, "numPrograms": 8,
   "programs": ["Vocal Air", "Close Vocal", "Hazy Pad", "Dub Vocal", "Wide Hall", "Room", "Init", "Silky Drums"],
   "params": [

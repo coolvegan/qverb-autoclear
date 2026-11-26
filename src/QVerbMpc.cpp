@@ -238,7 +238,7 @@ public:
         i.name = "QVerb";
         i.vendor = "Tilr";
         i.uniqueId = MPC_FOURCC ('q', 'v', 'r', 'b');
-        i.version = 1100;
+        i.version = 1101;
         i.isInstrument = false;
         i.numInputs = 2;
         i.numOutputs = 2;

@@ -96,7 +96,7 @@ The bottom waveform is the design reference, not a live scope.
 EOF
 
 cat > "$PKG/README.txt" <<'EOF'
-QVerb 1.1.0 - Auto-Clear vocal reverb for Akai MPC
+QVerb 1.1.1 - Auto-Clear vocal reverb for Akai MPC
 ===================================================
 
 QVerb is a compact vocal reverb built around a Dattorro/MVerb core, with a
@@ -145,7 +145,7 @@ echo "== 6/6  validate and zip"
 import os, shutil, sys
 pkg = sys.argv[1]
 root = os.path.dirname(os.path.dirname(pkg))
-archive = os.path.join(root, "Tilr - VST - QVerb-1.1.0")
+archive = os.path.join(root, "Tilr - VST - QVerb-1.1.1")
 shutil.make_archive(archive, "zip", os.path.dirname(pkg), os.path.basename(pkg))
 print("wrote " + archive + ".zip")
 PY

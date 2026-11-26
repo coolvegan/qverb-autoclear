@@ -1,13 +1,24 @@
 {
   "name": "QVerb",
   "manufacturer": "Tilr",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "format": "vst2",
   "kind": "effect",
   "uid": "qvrb",
   "numInputs": 2,
   "numOutputs": 2,
   "category": "Reverb",
+  "shortName": "QVerb",
+  "knobs": [
+    { "parameter": 0, "label": "Mix" },
+    { "parameter": 1, "label": "Decay" },
+    { "parameter": 2, "label": "Tone" }
+  ],
+  "shiftKnobs": [
+    { "parameter": 3, "label": "PreDly" },
+    { "parameter": 4, "label": "Width" },
+    { "parameter": 5, "label": "Clear" }
+  ],
   "file32": "VST/qverb-arm32.so",
   "file64": "VST/qverb-arm64.so",
   "description": "Vocal reverb with a musical Auto Clear ducker, pre-delay, tone, stereo width and an optional hard tank clear. Switchable 2x oversampling around the output limiter. Six knobs, eight programs.",
