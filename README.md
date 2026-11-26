@@ -1,12 +1,40 @@
 # QVerb — Auto-Clear Vocal Reverb for Akai MPC
 
+*Technically this is [MVerb](https://github.com/martineastwood/mverb) by Martin
+Eastwood plus an Auto Clear stage — see [Origin and name](#origin-and-name).*
+
 A compact vocal reverb with six knobs and two switches. The reverb core is
-MVerb's Dattorro figure-of-eight algorithm. The Auto Clear stage is a musical
-vocal-keyed ducker; at 100% it becomes a hard tank clear. The output limiter
-runs at 2x oversampling, so a hot reverb sum stays silky instead of turning
-fizzy.
+Martin Eastwood's MVerb, a Dattorro figure-of-eight tank. The Auto Clear stage
+is a musical vocal-keyed ducker; at 100% it becomes a hard tank clear. The
+output limiter runs at 2x oversampling, so a hot reverb sum stays silky instead
+of turning fizzy.
 
 ![QVerb on the Akai MPC](qverb-mpc.jpg)
+
+## Origin and name
+
+QVerb did not begin as a reverb design. It began as an empty text file whose
+only content was two links to DSP repositories:
+
+- [REV-246](https://github.com/tehguitarist/REV-246)
+- [MVerb](https://github.com/martineastwood/mverb)
+
+The task was to take the **Auto Clear** feature from
+[QDelay](https://github.com/coolvegan/qdelay-autoclear) and move it into a
+reverb, using those two repositories as the starting points for the algorithm
+choice. Both were evaluated; **MVerb was chosen as the core**. It is a complete,
+compact Dattorro implementation, it stays well-behaved at long decay times, and
+its parameter set (size, decay, damping, bandwidth, early/late mix) maps
+directly onto the six-knob MPC UI. REV-246 served as a reference for the ducker
+behaviour and the program idea; none of its EMT reverb engine is included.
+
+In DSP terms, then, this plugin is **MVerb + Auto Clear**. The accurate name
+would be *MVerb Auto Clear*. The `Q` prefix was kept only for personal
+consistency with QDelay and the rest of the series — the project is the work of
+someone finishing an idea for their MPC, not a new reverb algorithm. The credit
+for the reverb core belongs to **Martin Eastwood**.
+
+The two links above are also kept verbatim in [`examples`](examples).
 
 ## Controls
 
@@ -102,10 +130,15 @@ Input -> 80 Hz high-pass -> Pre-Delay -> MVerb/Dattorro
 
 ## Credits and license
 
-- MVerb by Martin Eastwood (Dattorro reverb), GPL-3.0-or-later.
+- **[MVerb](https://github.com/martineastwood/mverb)** by **Martin Eastwood** —
+  the reverb core of this plugin (Dattorro tank). GPL-3.0-or-later. His original
+  copyright header is preserved in [`src/MVerb.h`](src/MVerb.h), and the full
+  licence text is in `MVERB-LICENSE.txt`.
+- **[REV-246](https://github.com/tehguitarist/REV-246)** — evaluated as the
+  alternative reverb algorithm and used as a reference for the ducker and the
+  program idea; its EMT engine is not included in this plugin.
 - MPC plugin framework from the MIT-licensed MPC Plugin SDK.
-- QDelay/QVerb glue and Auto Clear by Tilr.
-- REV-246 was used as a reference for the ducker and program idea; its EMT
-  engine is not included.
+- QDelay/QVerb glue, UI and the Auto Clear port by Tilr.
+- Both starting points are recorded in [`examples`](examples).
 
 The project is GPL-3.0-or-later. See `LICENSE` and `MVERB-LICENSE.txt`.
