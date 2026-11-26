@@ -87,6 +87,13 @@ voice. The detector is adaptive and works over a sustained pad or a busy mix.
 140 %, Clear 62 %, Auto Clear on: a short, bright, wide bloom that only opens
 between the hits.
 
+## Programs and the MPC screen
+
+Selecting a program or loading a project now updates the MPC screen right away.
+The plugin reports every changed parameter to the host and requests a redraw, so
+the knobs show the new values instead of the previous positions. This is the
+behaviour in the 2026-11 builds.
+
 ## Build
 
 Requirements: Docker, a C++17 compiler for the native host test, and Python 3.
