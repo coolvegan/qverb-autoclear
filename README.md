@@ -108,7 +108,7 @@ writes:
 
 ```
 dist/mpc/Tilr - VST - QVerb/
-dist/Tilr - VST - QVerb-1.1.0.zip
+dist/Tilr - VST - QVerb-1.1.1.zip
 ```
 
 Install on a connected MPC:
@@ -130,6 +130,8 @@ Input -> 80 Hz high-pass -> Pre-Delay -> MVerb/Dattorro
 
 ## Versions
 
+- **1.1.1** — MPC Sample Knob FX mapping (Mix, Decay, Tone; SHIFT Pre-Delay,
+  Width, Clear), binary reports 1101.
 - **1.1.0** — 2x oversampled output limiter with an on/off switch, knee raised
   from −0.92 to −0.35 dBFS, new `Silky Drums` program.
 - **1.0.0** — first release. Tag `v1.0.0` is the reference version with the
